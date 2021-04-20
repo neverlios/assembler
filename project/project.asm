@@ -30,7 +30,7 @@ inc esi ;esi-counter
 jmp get
 
 getskip:
-
+ 
 ;printin the text
 
 print1:
@@ -45,69 +45,77 @@ inc edi
 cmp edi,esi
 jbe print1
 
+
+PUTCHAR 0x0A
+
 ;check the first symbol
-mov edx, digitL
-cmp [a], edx
+mov dl, digitL
+cmp byte[a], dl
 jb no
-mov edx, digitH
-cmp [a], edx
+
+mov dl, digitH
+cmp byte[a], dl
 ja no
 
 ;check the last symbol
-mov edx, digitL
-cmp [a+esi-1], edx
+mov dl, digitL
+dec esi
+cmp byte[a+esi], dl
 jb no ; <
-mov edx, digitH
-cmp [a+esi-1], edx
+mov dl, digitH
+cmp byte[a+esi], dl
+inc esi
 ja no ; >
 
 ; check equality
-mov edx, [a]
-cmp [a+esi-1], edx
+mov dl, byte[a]
+cmp byte [a+esi-1], dl
 je no
 
+mov edi, 0
 ;yes rule
 yes:
-mov edi, 0
 ;edi-temp cycle counter
-mov edx, letterL
-cmp [a+edi], edx
+mov dl, letterL
+cmp byte[a+edi], dl
 jb skip1
-mov edx, letterH
-cmp [a+edi], edx
+mov dl, letterH
+cmp byte[a+edi], dl
 ja skip1
 
-mov dh, 0d32
-add byte[a+edi], dh
+;mov byte[a+edi], 0
+add byte[a+edi], 0x20
 
 skip1:
 inc edi
 cmp edi,esi
 jbe yes
+jmp jumpspot
 
 ;no rule
 no:
-mov cl,1
+mov edi,1
 mov ah, byte[a]
 no1:
-;cl-temp cycle counter
-cmp [a+edi], ah
+;edi-temp cycle counter
+cmp byte[a+edi], ah
 jne skip
 
 ;deleting
-mov edx, excl
-mov [a+edi], edx
+mov dh, excl
+mov byte[a+edi], dh
 
 skip:
 inc edi
 cmp edi, esi
 jbe no1
 
+jumpspot:
 ;printin the text
 mov edi,0
 print:
-mov edx, excl
-cmp [a+edi], edx
+mov dh, excl
+cmp byte[a+edi], dh
 je pskip
 
 PUTCHAR [a+edi]
