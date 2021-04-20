@@ -6,17 +6,16 @@ section .bss
 a resb 100
 
 section .data
-digitL db 0x30
-digitH db 0x39
+digitL equ 0x30
+digitH equ 0x39
 
-letterL db 0x61
-letterH db 0x7A
+letterL equ 0x61
+letterH equ 0x7A
 
-const db 0x20
-excl db 0x8A
+const equ 0x20
+excl equ 0x8A
 
-qchar db 0x00 ;quitting char
-
+qchar equ 0x00 ;quitting char
 section .text
 _start:
 
