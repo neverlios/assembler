@@ -15,7 +15,7 @@ letterH equ 0x5A
 const equ 0x20
 excl equ 0x8A
 
-qchar equ 0x21 ;quitting char
+qchar equ 0 ;quitting char
 section .text
 _start:
 
@@ -125,4 +125,5 @@ inc edi
 cmp edi,esi
 jbe print
 
+PUTCHAR 0x0A
 FINISH
