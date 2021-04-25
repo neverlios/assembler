@@ -1,0 +1,133 @@
+    .model flat, c
+gets   proto 
+puts   proto 
+strlen proto
+includelib msvcrt.lib
+includelib ucrt.lib
+includelib legacy_stdio_definitions.lib
+
+    .data
+str1 db 101 dup(?)
+
+    .code
+main proc
+    push offset str1    ; Добавляем адрес строки в стек
+    call gets           ; Вызов функции gets для ввода текста
+    add esp, 4          ; Выравнивание стека
+
+    push offset str1    ; Добавляем адрес строки в стек
+    call puts           ; Вызов функции puts для вывода текста
+    add esp, 4          ; Выравнивание стека
+
+    push offset str1    ; Добавляем адрес строки в стек
+    call strlen         ; Вызов функции strlen для определения длины строки
+    add esp, 4          ; Выравнивание стека
+
+    mov ebx, eax        ; Возвращаемое значение функции strlen лежит в eax
+
+    xor esi, esi
+
+cycle_condition:
+    mov dl, str1[esi]   ; Загружаем текущий символ строки
+                        
+                        ; Проверка на цифру
+    cmp dl, '0'         
+    jb proc_2           ; Точно не цифра и не буква
+                        
+    cmp dl, '9'
+    ja condition_2      ; Нет, не цифра, но может быть буквой
+    jmp next            ; Да, это цифра
+
+condition_2:
+                        ; Проверка на заглавную букву
+    cmp dl, 'A'           
+    jb proc_2           ; Точно не цифра и не буква
+
+    cmp dl, 'Z'         
+    ja condition_3      ; Нет, не цифра и не заглавная буква, но может быть строчной
+    jmp next            ; Да, это заглавная буква
+
+condition_3:
+                        ; Проверка на строчную букву
+    cmp dl, 'a'
+    jb proc_2           ; Точно не цифра и не буква
+
+    cmp dl, 'z'
+    ja proc_2           ; Точно не цифра и не буква
+
+    jmp next            ; Да, это строчная буква
+
+next:
+    inc esi
+    cmp esi, ebx
+    jb cycle_condition
+                        ; Вышли из цикла и не попали не разу на jmp proc_2
+                        ; Значит условие выполнилось
+    call pr1
+    jmp end_program
+
+proc_2:
+    call pr2            ; Условие не выполнилось.
+
+end_program:
+
+    push offset str1    ; Добавляем адрес строки в стек
+    call puts           ; Вызов функции puts для вывода текста
+    add esp, 4          ; Выравнивание стека
+
+    xor eax, eax        ; Возвращаемое значение main равно 0
+    ret
+main endp               
+
+pr1 proc 
+    xor esi, esi
+
+cycle_pr1:
+    mov al, str1[esi]
+                        ; Ищем заглавную латинскую букву
+    cmp al, 'A'
+    jb next_symbol
+
+    cmp al, 'Z'
+    ja next_symbol
+                        ; Нашли нужную букву
+    sub al, 'A' + 1    ; 'A' - 1 первая буква 
+
+    mov ah, 0
+    mov cl, 10
+    div cl
+
+    add ah, '0'         ; Остаток от деления лежит в ah
+    mov str1[esi], ah
+
+next_symbol:
+    inc esi
+
+    cmp esi, ebx
+    jb cycle_pr1
+
+pr1 endp
+
+
+pr2 proc
+    xor esi, esi        ; Выставляем регистр esi на начало текста, будем использовать его как индекс символов первой половины текста
+    mov edi, ebx
+    sub edi, 1          ; Выставляем регистр edi на конец  текста, будем использовать его как индекс символов второй половины текста
+
+    shr ebx, 1          ; Находим середину текста с помощью побитового сдвига (целочисленное деление на 2)
+
+cycle_pr2:
+    mov dl, str1[esi]           ;
+    mov dh, str1[edi]
+    mov str1[edi], dh   ; Меняем местами символа, начиная с концов 
+    mov str1[edi], dl           ; и приближаясь к середине
+
+    inc esi
+    dec edi
+
+    cmp esi, ebx                ; Условие выхода: дошли до середины
+    jb cycle_pr2
+
+    ret
+pr2 endp
+END
