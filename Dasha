@@ -91,7 +91,7 @@ cycle_pr1:
     cmp al, 'Z'
     ja next_symbol
                         ; Нашли нужную букву
-    sub al, 'A' + 1    ; 'A' - 1 первая буква 
+    sub al, 'A' - 1    ; 'A' - 1 первая буква 
 
     mov ah, 0
     mov cl, 10
@@ -106,8 +106,8 @@ next_symbol:
     cmp esi, ebx
     jb cycle_pr1
 
-pr1 endp
 
+pr1 endp
 
 pr2 proc
     xor esi, esi        ; Выставляем регистр esi на начало текста, будем использовать его как индекс символов первой половины текста
@@ -119,7 +119,7 @@ pr2 proc
 cycle_pr2:
     mov dl, str1[esi]           ;
     mov dh, str1[edi]
-    mov str1[edi], dh   ; Меняем местами символа, начиная с концов 
+    mov str1[esi], dh   ; Меняем местами символа, начиная с концов 
     mov str1[edi], dl           ; и приближаясь к середине
 
     inc esi
