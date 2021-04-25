@@ -105,8 +105,8 @@ next_symbol:
 
     cmp esi, ebx
     jb cycle_pr1
-
-
+    
+    ret
 pr1 endp
 
 pr2 proc
